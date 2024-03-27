@@ -169,17 +169,16 @@ SELECT TEST1, SUBCODE
 FROM IAMARKS
 WHERE USN = '1AP13CS091';
 
-UPDATE IAMARKS I
-SET FINALIA = (SELECT AVG(best_two) 
-               FROM (SELECT USN, 
-                            (SELECT MAX(TEST_MARK)
-                             FROM (SELECT TEST1 AS TEST_MARK UNION ALL
-                                   SELECT TEST2 UNION ALL
-                                   SELECT TEST3) AS test_marks) AS best_two
-                     FROM IAMARKS AS IA
-                     WHERE IA.USN = I.USN
-                     GROUP BY IA.USN) AS subquery)
-WHERE FINALIA IS NULL;
+UPDATE IAMARKS i
+SET FinalIA = (SELECT AVG(marks) FROM (
+    SELECT marks FROM (
+        SELECT Test1 as marks
+        UNION ALL SELECT Test2
+        UNION ALL SELECT Test3
+    ) AS all_marks
+    ORDER BY marks DESC
+    LIMIT 2
+) AS best_two);
 
 
 SELECT S.USN,S.SNAME,S.ADDRESS,S.PHONE,S.GENDER,
